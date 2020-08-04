@@ -38,11 +38,13 @@ const useStyles = makeStyles((theme) => ({
 
 interface DispatchProps {
   signupPage(): void,
+  eventsPage(): void,
+
 }
 
 type Props = DispatchProps;
 
-const LoginPage = ({ signupPage }: Props) => {
+const LoginPage = ({ signupPage, eventsPage }: Props) => {
   const classes = useStyles();
 
   return (
@@ -88,6 +90,7 @@ const LoginPage = ({ signupPage }: Props) => {
             variant="contained"
             color="primary"
             className={classes.submit}
+            onClick={() => {eventsPage()}}
           >
             Sign In
           </Button>

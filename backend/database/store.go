@@ -1,0 +1,128 @@
+package database
+
+import (
+	"database/sql"
+	"io/ioutil"
+
+	"github.com/jmoiron/sqlx"
+	"gopkg.in/yaml.v2"
+)
+
+//Store implements the StoreInterface
+type Store struct {
+	db *sqlx.DB
+}
+
+//StoreInterface interface to all actions in database
+type StoreInterface interface {
+	InsertNewUser(firstName, lastName, email, password string) error
+	InsertNewEvent(name, description string, start, end int64) (int64, error)
+	InsertNewUserEvent(userEmail string, eventID int64, confirmed bool) error
+	GetUser(userEmail string) (*User, error)
+	GetEvents(userEmail string) ([]Event, error)
+}
+
+func getConfig(filepath string) (*Config, error) {
+	f, err := ioutil.ReadFile(filepath)
+	if err != nil {
+		return nil, err
+	}
+
+	cfg := &Config{}
+	if err := yaml.Unmarshal(f, &cfg); err != nil {
+		return nil, err
+	}
+
+	return cfg, nil
+}
+
+//NewStore create a new store with the seted config
+func NewStore(cfgFilepath string) (*Store, error) {
+	cfg, err := getConfig(cfgFilepath)
+	if err != nil {
+		return nil, err
+	}
+
+	db, err := CreateDB(*cfg)
+	if err != nil {
+		return nil, err
+	}
+	return &Store{db}, nil
+}
+
+//Ping just test the connection with database
+func (s *Store) Ping() error {
+	return s.db.Ping()
+}
+
+func (s *Store) InsertNewUser(firstName, lastName, email, password string) error {
+	_, err := s.db.Exec(insertNewUser, firstName, lastName, email, password)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Store) InsertNewEvent(name, description string, start, end int64) (int64, error) {
+	var eventID int64
+	err := s.db.QueryRow(insertNewEvent, name, description, start, end).Scan(&eventID)
+	if err != nil {
+		return 0, err
+	}
+
+	return eventID, nil
+}
+
+func (s *Store) InsertNewUserEvent(userEmail string, eventID int64, confirmed bool) error {
+	_, err := s.db.Exec(insertNewUserEvent, userEmail, eventID, confirmed)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Store) GetUser(userEmail string) (*User, error) {
+	user := &User{}
+	rows, err := s.db.Queryx(getUser, userEmail)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		if err := rows.StructScan(&user); err != nil {
+			return nil, err
+		}
+	}
+
+	return user, nil
+}
+
+func (s *Store) GetEvents(userEmail string) ([]Event, error) {
+	var events []Event
+
+	rows, err := s.db.Queryx(getEvents, userEmail)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return []Event{}, nil
+		}
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var event Event
+		if err := rows.StructScan(&event); err != nil {
+			return events, err
+		}
+		events = append(events, event)
+	}
+	if err := rows.Err(); err != nil {
+		return events, err
+	}
+	return events, nil
+
+}

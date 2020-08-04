@@ -1,0 +1,52 @@
+ 
+version: '3'
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: "haha1212"
+    container_name: postgres
+    ports:
+      - "15432:5432"
+    volumes:
+      - /home/
+    networks:
+      - postgres-network
+    logging:
+      driver: none
+      
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "haha1212"
+      PGADMIN_DEFAULT_PASSWORD: "haha1212"
+    container_name: pgadmin
+    ports:
+      - "16543:80"
+    depends_on:
+      - postgres
+    networks:
+      - postgres-network
+    logging:
+      driver: none
+  
+
+  rest-api:
+    build:
+      context: .
+      dockerfile: rest-api.dockerfile
+    container_name: rest-api
+    ports:
+      - "5002:5002"
+    depends_on:
+      - postgres
+    environment:
+      CONFIG_DB_FILEPATH: 'db-config.yaml'
+    networks:
+      - postgres-network
+
+
+networks: 
+  postgres-network:
+    driver: bridge

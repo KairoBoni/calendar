@@ -1,48 +1,28 @@
 package server
 
 import (
-	"fmt"
-	"io/ioutil"
-
+	"github.com/KairoBoni/calendar/backend/database"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"gopkg.in/yaml.v2"
+	"github.com/rs/zerolog/log"
 )
 
-type config struct {
-	Port string `yaml:"port"`
-}
-
 type Server struct {
-	route *echo.Echo
-	cfg   *config
+	route    *echo.Echo
+	handlers *Handler
 }
 
-//This function is unused for now
-func getConfig(path string) (*config, error) {
-	f, err := ioutil.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-
-	cfg := &config{}
-	if err := yaml.Unmarshal(f, &cfg); err != nil {
-		return nil, err
-	}
-	fmt.Println(cfg)
-
-	return cfg, nil
-
-}
-
-func NewServer(path string) (*Server, error) {
-	cfg, err := getConfig(path)
+//NewServer create a new server of the REST-API
+func NewServer(dbConfigFilepath string) (*Server, error) {
+	store, err := database.NewStore(dbConfigFilepath)
 	if err != nil {
 		return nil, err
 	}
 	s := &Server{
 		route: echo.New(),
-		cfg:   cfg,
+		handlers: &Handler{
+			db: store,
+		},
 	}
 	s.setupRoutes()
 
@@ -51,12 +31,18 @@ func NewServer(path string) (*Server, error) {
 }
 
 func (s *Server) setupRoutes() {
-	s.route.Use(middleware.Logger())
 	s.route.Use(middleware.Recover())
 
-	s.route.Static("/", "./web")
+	s.route.POST("/user/create", s.handlers.createUser)
+	s.route.POST("/user/login", s.handlers.login)
+	s.route.POST("/event/create", s.handlers.createEvent)
+	s.route.GET("/event/list/:email", s.handlers.getEvents)
+
 }
 
+//Run starts the server
 func (s *Server) Run() error {
-	return s.route.Start(":" + s.cfg.Port)
+	s.route.HideBanner = true
+	log.Info().Msg("Server start on localhost:5002/")
+	return s.route.Start(":5002")
 }

@@ -1,13 +1,15 @@
 import React from "react";
-import { bindActionCreators, Dispatch } from "redux";
 import Login from "../Login";
 import Signup from "../Signup";
+import Events from "../Events";
 import { AppReducer } from "../../types";
 import { connect } from "react-redux";
 
 let componentMap= new Map();
 componentMap.set("LOGIN_PAGE",  <Login/>)
 componentMap.set("SIGNUP_PAGE",  <Signup/>)
+componentMap.set("EVENTS_PAGE",  <Events/>)
+
 
 
 interface StateProps {

@@ -5,7 +5,7 @@ import { AppReducer } from "../types";
 
 
 const initialState: AppReducer = {
-    page: "LOGIN_PAGE",
+    page: "EVENTS_PAGE",
 };
 
 
@@ -15,6 +15,8 @@ const appReducer: Reducer = (state = initialState, action) => {
      return { ...state, page: "LOGIN_PAGE"};
     case CalendarActionTypes.SIGNUP_PAGE:
       return { ...state, page: "SIGNUP_PAGE"};
+    case CalendarActionTypes.EVENTS_PAGE:
+      return { ...state, page: "EVENTS_PAGE"};
     default:
       return state;
   }

@@ -8,6 +8,10 @@ export const signupPage = () => (dispatch: any) => {
 
 export const loginPage = () => (dispatch: any) => {
     //   dispatch({type: FeedManagerActionTypes.FEED_MANAGER_START_LOADING});
-        dispatch({type: CalendarActionTypes.LOGIN_PAGE});
-    };
+    dispatch({type: CalendarActionTypes.LOGIN_PAGE});
+};
     
+export const eventsPage = () => (dispatch: any) => {
+    //   dispatch({type: FeedManagerActionTypes.FEED_MANAGER_START_LOADING});
+    dispatch({type: CalendarActionTypes.EVENTS_PAGE});
+};

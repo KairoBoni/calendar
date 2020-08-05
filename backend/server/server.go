@@ -33,6 +33,8 @@ func NewServer(dbConfigFilepath string) (*Server, error) {
 func (s *Server) setupRoutes() {
 	s.route.Use(middleware.Recover())
 
+	s.route.Use(corsMiddleware([]string{"http://localhost:3000"}))
+
 	s.route.POST("/user/create", s.handlers.createUser)
 	s.route.POST("/user/login", s.handlers.login)
 	s.route.POST("/event/create", s.handlers.createEvent)
@@ -45,4 +47,11 @@ func (s *Server) Run() error {
 	s.route.HideBanner = true
 	log.Info().Msg("Server start on localhost:5002/")
 	return s.route.Start(":5002")
+}
+
+func corsMiddleware(allowOrigins []string) echo.MiddlewareFunc {
+	return middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:     allowOrigins,
+		AllowCredentials: true,
+	})
 }

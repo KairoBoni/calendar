@@ -1,13 +1,12 @@
-import React from "react";
+import React, { useState }  from "react";
 import { bindActionCreators, Dispatch } from "redux";
 import {connect} from "react-redux";
+import { UserReducer, Login } from '../../types'
 import * as AppActions from "../../actions/AppActions";
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
@@ -39,13 +38,23 @@ const useStyles = makeStyles((theme) => ({
 interface DispatchProps {
   signupPage(): void,
   eventsPage(): void,
+  login(user: Login): void
 
 }
 
 type Props = DispatchProps;
 
-const LoginPage = ({ signupPage, eventsPage }: Props) => {
+const LoginPage = ({ signupPage, eventsPage, login }: Props) => {
   const classes = useStyles();
+
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  const clearForm = () => {
+    setEmail('')
+    setPassword('')
+  }
+
 
   return (
     <Container component="main" maxWidth="xs">
@@ -68,6 +77,8 @@ const LoginPage = ({ signupPage, eventsPage }: Props) => {
             name="email"
             autoComplete="email"
             autoFocus
+            value={email}
+            onChange={event => setEmail(event.target.value)}
           />
           <TextField
             variant="outlined"
@@ -79,18 +90,22 @@ const LoginPage = ({ signupPage, eventsPage }: Props) => {
             type="password"
             id="password"
             autoComplete="current-password"
-          />
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
+            value={password}
+            onChange={event => setPassword(event.target.value)}
           />
           <Button
-            type="submit"
             fullWidth
             variant="contained"
             color="primary"
             className={classes.submit}
-            onClick={() => {eventsPage()}}
+            onClick={() => {
+              const user: Login = {
+                email: email,
+                password: password
+            };
+              login(user)
+              clearForm()
+            }}
           >
             Sign In
           </Button>

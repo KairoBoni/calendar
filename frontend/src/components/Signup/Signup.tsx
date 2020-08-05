@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { bindActionCreators, Dispatch } from "redux";
-import {connect} from "react-redux";
+import { connect } from "react-redux";
 import * as AppActions from "../../actions/AppActions";
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -12,6 +12,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import { User } from '../../types'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -37,13 +38,26 @@ const useStyles = makeStyles((theme) => ({
 
 interface DispatchProps {
   loginPage(): void,
+  createUser(user: User): void
 }
 
 type Props = DispatchProps;
 
 
-const SignupPage = ({ loginPage }: Props) => {
+const SignupPage = ({ loginPage, createUser }: Props) => {
   const classes = useStyles();
+
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  const clearForm = () => {
+    setFirstName('')
+    setLastName('')
+    setEmail('')
+    setPassword('')
+  }
 
   return (
     <Container component="main" maxWidth="xs">
@@ -66,6 +80,8 @@ const SignupPage = ({ loginPage }: Props) => {
                 fullWidth
                 id="firstName"
                 label="First Name"
+                value={firstName}
+                onChange={event => setFirstName(event.target.value)}
                 autoFocus
               />
             </Grid>
@@ -78,6 +94,8 @@ const SignupPage = ({ loginPage }: Props) => {
                 label="Last Name"
                 name="lastName"
                 autoComplete="lname"
+                value={lastName}
+                onChange={event => setLastName(event.target.value)}
               />
             </Grid>
             <Grid item xs={12}>
@@ -89,6 +107,8 @@ const SignupPage = ({ loginPage }: Props) => {
                 label="Email Address"
                 name="email"
                 autoComplete="email"
+                value={email}
+                onChange={event => setEmail(event.target.value)}
               />
             </Grid>
             <Grid item xs={12}>
@@ -101,15 +121,27 @@ const SignupPage = ({ loginPage }: Props) => {
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                value={password}
+                onChange={event => setPassword(event.target.value)}
               />
             </Grid>
           </Grid>
           <Button
-            type="submit"
             fullWidth
             variant="contained"
             color="primary"
             className={classes.submit}
+            onClick={() => {
+              const user: User = {
+                first_name: firstName,
+                last_name: lastName,
+                email: email,
+                password: password
+            };
+
+              createUser(user)
+              clearForm()
+            }}
           >
             Sign Up
           </Button>

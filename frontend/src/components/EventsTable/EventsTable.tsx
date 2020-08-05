@@ -12,16 +12,20 @@ import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
-import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
+import EditIcon from '@material-ui/icons/Edit';
 import { green } from '@material-ui/core/colors';
+import { Event } from "../../types";
+
 
 
 interface AddEventProps {
   handleOpenAddEvent(): void
+  handleOpenEditEvent(id: number): void
+  events: Event[]
 }
 
 type Props = AddEventProps;
@@ -32,6 +36,7 @@ interface Data {
   description: string,
   start: number;
   end: number;
+  id: number;
 }
 
 function createData(
@@ -39,16 +44,24 @@ function createData(
   description: string,
   start: number,
   end: number,
+  id: number,
 ): Data {
-  return { name, description, start, end};
+  return { name, description, start, end, id};
 }
 
-const rows = [
-  createData('Cupcake', "reuniao com tio san", 3, 67),
-  createData('Donut', "452", 25, 51),
-  createData('Eclair', "262", 16, 24),
-  createData('Frozen yoghurt', "159", 6, 24),
-];
+
+function timeConverter(UNIX_timestamp: number){
+  var a = new Date(UNIX_timestamp);
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var year = a.getFullYear();
+  var month = months[a.getMonth()];
+  var date = a.getDate();
+  var hour = a.getHours();
+  var min = a.getMinutes();
+  var sec = a.getSeconds();
+  var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
+  return time;
+}
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -115,12 +128,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
     <TableHead>
       <TableRow>
         <TableCell padding="checkbox">
-          <Checkbox
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            inputProps={{ 'aria-label': 'select all desserts' }}
-          />
+          <p/>
         </TableCell>
         {headCells.map((headCell) => (
           <TableCell
@@ -240,7 +248,13 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const EventsTable = ({ handleOpenAddEvent }: Props) => {
+const EventsTable = ({ handleOpenAddEvent, handleOpenEditEvent, events }: Props) => {
+
+  const rows = events
+  .filter(item => item.id != 0)
+  .map((item) => {
+    return createData(item.name, item.description, item.start, item.end, item.id)
+  })
   const classes = useStyles();
   const [order, setOrder] = React.useState<Order>('asc');
   const [orderBy, setOrderBy] = React.useState<keyof Data>('name');
@@ -261,26 +275,6 @@ const EventsTable = ({ handleOpenAddEvent }: Props) => {
       return;
     }
     setSelected([]);
-  };
-
-  const handleClick = (event: React.MouseEvent<unknown>, name: string) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected: string[] = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
-      );
-    }
-
-    setSelected(newSelected);
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -326,7 +320,6 @@ const EventsTable = ({ handleOpenAddEvent }: Props) => {
                   return (
                     <TableRow
                       hover
-                      onClick={(event) => handleClick(event, row.name)}
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
@@ -334,17 +327,16 @@ const EventsTable = ({ handleOpenAddEvent }: Props) => {
                       selected={isItemSelected}
                     >
                       <TableCell padding="checkbox">
-                        <Checkbox
-                          checked={isItemSelected}
-                          inputProps={{ 'aria-labelledby': labelId }}
-                        />
+                        <IconButton aria-label="filter list" onClick={() => handleOpenEditEvent(row.id)}>
+                          <EditIcon />
+                        </IconButton>
                       </TableCell>
                       <TableCell component="th" id={labelId} scope="row" padding="none">
                         {row.name}
                       </TableCell>
                       <TableCell align="left">{row.description}</TableCell>
-                      <TableCell align="left">{row.start}</TableCell>
-                      <TableCell align="left">{row.end}</TableCell>
+                      <TableCell align="left">{timeConverter(row.start)}</TableCell>
+                      <TableCell align="left">{timeConverter(row.end)}</TableCell>
                     </TableRow>
                   );
                 })}

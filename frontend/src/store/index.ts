@@ -5,9 +5,14 @@ import thunk from "redux-thunk";
 import { composeWithDevTools } from 'redux-devtools-extension';
 import reducers from '../reducers'
 
+const client = axios.create({ //all axios can be used, shown in axios documentation
+  baseURL:'http://localhost:5002/',
+  responseType: 'json'
+});
+
 const store: any = createStore(
   reducers,
-  composeWithDevTools(applyMiddleware(axiosMiddleware(axios), thunk)),
+  composeWithDevTools(applyMiddleware(axiosMiddleware(client), thunk)),
 );
 
 export default store;

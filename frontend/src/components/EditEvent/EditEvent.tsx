@@ -8,12 +8,8 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
 import { TransitionProps } from '@material-ui/core/transitions';
 import TextField from '@material-ui/core/TextField';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import { DateTimePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
@@ -58,28 +54,24 @@ const Transition = React.forwardRef(function Transition(
 interface AddEventProps {
     handleClose(): void
     isOpen: boolean
-    userEmail: string
+    event?: Event
     userEvents: Event[]
-
 }
 
 interface DispatchProps {
-  createEvent(event: Event): void
   DispatchNewMsg(severity: "success" | "error" | "info" | "warning", msg: string): void
-  getEvents(email: string): void
 }
 
 
 type Props = AddEventProps & DispatchProps;
 
-const AddEvent = ({ handleClose, isOpen, createEvent, userEmail, userEvents, DispatchNewMsg, getEvents }: Props) => {
+const EditEvent = ({ handleClose, isOpen, event, DispatchNewMsg, userEvents }: Props) => {
   const classes = useStyles();
 
-  const [start, setStart] = useState<Date | null>(new Date())
-  const [end, setEnd] = useState<Date | null>(new Date())
-  const [name, setName] = useState('')
-  const [invite, setInvite] = useState('');
-  const [description, setDescription] = useState('')
+  const [start, setStart] = useState<Date | null>(new Date(event!.start))
+  const [end, setEnd] = useState<Date | null>(new Date(event!.end))
+  const [name, setName] = useState(event!.name)
+  const [description, setDescription] = useState(event!.description)
 
 
   const clearForm = () => {
@@ -119,20 +111,6 @@ const AddEvent = ({ handleClose, isOpen, createEvent, userEmail, userEvents, Dis
             value={description}
             onChange={event => setDescription(event.target.value)}
             />
-            <p/>
-            <FormControl>
-              <InputLabel id="select-label">Invite</InputLabel>
-              <Select
-                labelId="select-label"
-                id="select"
-                value={invite}
-                onChange={e => setInvite(e.target.value as string)}
-              >
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>Thirty</MenuItem>
-              </Select>
-            </FormControl>
         </div>
         <p/>
         <div className={classes.Calendar}>
@@ -160,24 +138,19 @@ const AddEvent = ({ handleClose, isOpen, createEvent, userEmail, userEvents, Dis
         <DialogActions>
           <Button onClick={() => {
           if (VerifyTimes(start!, end!, userEvents)) {
-              const event: Event = {
-                id: 0,
-                name: name,
-                description: description,
-                user_email: userEmail,
-                start: start!.getTime(),
-                end: end!.getTime()
-            };
-  
-              createEvent(event)
-              getEvents(userEmail)
-              clearForm()
-
           } else {
             DispatchNewMsg("warning", "Cant Create New event, verify the time of start and end")
           }
           }} color="primary">
             Schedule
+          </Button>
+          <Button onClick={() => {
+          if (VerifyTimes(start!, end!, userEvents)) {
+          } else {
+            DispatchNewMsg("warning", "Cant Create New event, verify the time of start and end")
+          }
+          }} color="secondary">
+            Delete
           </Button>
           <Button onClick={handleClose} color="secondary">
             Cancel
@@ -195,7 +168,7 @@ const mapStateToProps = ()  => ({});
 
 const mapDispatchToProps = (dispatch: Dispatch) => bindActionCreators(AppActions, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(AddEvent);
+export default connect(mapStateToProps, mapDispatchToProps)(EditEvent);
 
 
 

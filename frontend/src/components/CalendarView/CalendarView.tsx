@@ -2,6 +2,7 @@ import React from "react";
 import Login from "../Login";
 import Signup from "../Signup";
 import Events from "../Events";
+import SnackBar from "../SnackBar";
 import { AppReducer } from "../../types";
 import { connect } from "react-redux";
 
@@ -22,9 +23,10 @@ interface DispatchProps {
 type Props = StateProps & DispatchProps;
 
 const CalendarView = ({ app }: Props) => {
-    return (
+        return (
         <React.Fragment>
-             {componentMap.get(app.page)}
+            <SnackBar/>
+            {componentMap.get(app.page)}
         </React.Fragment>
     )
 };

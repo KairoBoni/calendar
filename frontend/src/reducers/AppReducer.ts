@@ -19,7 +19,6 @@ const appReducer: Reducer = (state = initialState, action) => {
     case CalendarActionTypes.EVENTS_PAGE:
       return { ...state, page: "EVENTS_PAGE"};
     case CalendarActionTypes.NEW_MSG:
-      console.log(action.payload.msg)
       return { ...state, openSnackBar: true, msgSnackBar: action.payload.msg, severitySnackBar: action.payload.severity};
     case CalendarActionTypes.CLOSE_SNACKBAR:
       return { ...state, openSnackBar: false};

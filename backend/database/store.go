@@ -2,10 +2,8 @@ package database
 
 import (
 	"database/sql"
-	"io/ioutil"
 
 	"github.com/jmoiron/sqlx"
-	"gopkg.in/yaml.v2"
 )
 
 //Store implements the StoreInterface
@@ -27,25 +25,15 @@ type StoreInterface interface {
 	RefuseInvite(email string, id int64) error
 }
 
-func getConfig(filepath string) (*Config, error) {
-	f, err := ioutil.ReadFile(filepath)
-	if err != nil {
-		return nil, err
-	}
-
-	cfg := &Config{}
-	if err := yaml.Unmarshal(f, &cfg); err != nil {
-		return nil, err
-	}
-
-	return cfg, nil
-}
-
 //NewStore create a new store with the seted config
-func NewStore(cfgFilepath string) (*Store, error) {
-	cfg, err := getConfig(cfgFilepath)
-	if err != nil {
-		return nil, err
+func NewStore() (*Store, error) {
+
+	cfg := &Config{
+		Host:     "postgres",
+		Port:     5432,
+		Username: "postgres",
+		Password: "haha1212",
+		Name:     "postgres",
 	}
 
 	db, err := CreateDB(*cfg)

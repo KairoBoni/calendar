@@ -81,7 +81,6 @@ export const login = (user: Login) => (dispatch: any) => {
                     payload: response.data,
                 });
 
-                console.log(response)
                 const message = (response.status === 200) ? "Success" : "Wrong User or Passoword"
                 const severity = (response.status === 200) ? "success" : "warning"
                 dispatch(newMsg(
@@ -182,7 +181,6 @@ export const getEmailUsers = () => (dispatch: any) => {
                     type: CalendarActionTypes.GET_USERS_EMAIL_SUCCESS,
                     payload: response.data,
                 });
-                console.log(response.data)
                 dispatch(setEventPage());
             },
             onError: ({ response }: any) => {

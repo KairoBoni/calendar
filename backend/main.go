@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"os"
 	"time"
 
 	"github.com/KairoBoni/calendar/backend/server"
@@ -14,7 +13,7 @@ func main() {
 
 	time.Sleep(10 * time.Second)
 
-	s, err := server.NewServer(os.Getenv("CONFIG_DB_FILEPATH"))
+	s, err := server.NewServer()
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to create API Server")
 	}

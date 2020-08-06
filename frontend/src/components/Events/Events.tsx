@@ -83,7 +83,6 @@ const Events = ({ getEvents, getEmailUsers , userReducer }: Props) => {
   const handleCloseEditEvent = () => {
     setOpenEditEvent(false);
   };
-  console.log(userReducer.events)
 
     const classes = useStyles();
     return (

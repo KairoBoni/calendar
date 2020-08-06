@@ -130,6 +130,7 @@ const AddEvent = ({ handleClose, isOpen, createEvent, userEmail, userEvents, Dis
                 value={invite}
                 onChange={e => setInvite(e.target.value as string)}
               >
+                <MenuItem value={""} key={""}>        </MenuItem>
                 {
                   userEmailList
                   .filter(email => email !== userEmail)

@@ -13,8 +13,8 @@ type Server struct {
 }
 
 //NewServer create a new server of the REST-API
-func NewServer(dbConfigFilepath string) (*Server, error) {
-	store, err := database.NewStore(dbConfigFilepath)
+func NewServer() (*Server, error) {
+	store, err := database.NewStore()
 	if err != nil {
 		return nil, err
 	}
@@ -34,6 +34,8 @@ func (s *Server) setupRoutes() {
 	s.route.Use(middleware.Recover())
 
 	s.route.Use(corsMiddleware([]string{"http://localhost:3000"}))
+
+	s.route.Static("/", "./web")
 
 	s.route.POST("/user/create", s.handlers.createUser)
 	s.route.POST("/user/login", s.handlers.login)

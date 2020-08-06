@@ -73,7 +73,6 @@ const MenuAppBar = ({ logout, loginPage }: Props) => {
                 onClose={handleClose}
               >
                 <MenuItem onClick={() => {
-                  logout()
                   loginPage()
                 }
                 }>Logout</MenuItem>

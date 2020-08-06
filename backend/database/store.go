@@ -20,6 +20,11 @@ type StoreInterface interface {
 	InsertNewUserEvent(userEmail string, eventID int64, confirmed bool) error
 	GetUser(userEmail string) (*User, error)
 	GetEvents(userEmail string) ([]Event, error)
+	GetUsersEmails() ([]string, error)
+	UpdateEvent(id int64, name, description string, start, end int64) error
+	DeleteEvent(id int64) error
+	ConfirmInvite(email string, id int64) error
+	RefuseInvite(email string, id int64) error
 }
 
 func getConfig(filepath string) (*Config, error) {
@@ -101,6 +106,32 @@ func (s *Store) GetUser(userEmail string) (*User, error) {
 	return user, nil
 }
 
+func (s *Store) GetUsersEmails() ([]string, error) {
+	var emails []string
+
+	rows, err := s.db.Queryx(getUsersEmail)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return []string{}, nil
+		}
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var email string
+		if err := rows.Scan(&email); err != nil {
+			return emails, err
+		}
+		emails = append(emails, email)
+	}
+	if err := rows.Err(); err != nil {
+		return emails, err
+	}
+	return emails, nil
+
+}
+
 func (s *Store) GetEvents(userEmail string) ([]Event, error) {
 	var events []Event
 
@@ -125,4 +156,41 @@ func (s *Store) GetEvents(userEmail string) ([]Event, error) {
 	}
 	return events, nil
 
+}
+
+func (s *Store) UpdateEvent(id int64, name, description string, start, end int64) error {
+	_, err := s.db.Queryx(updateEvent, name, description, start, end, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Store) DeleteEvent(id int64) error {
+	_, err := s.db.Queryx(deleteUserEvent, id)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.db.Queryx(deleteEvent, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Store) ConfirmInvite(email string, id int64) error {
+	_, err := s.db.Queryx(confirmInvite, email, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Store) RefuseInvite(email string, id int64) error {
+	_, err := s.db.Queryx(refuseInvite, email, id)
+	if err != nil {
+		return err
+	}
+	return nil
 }

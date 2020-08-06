@@ -8,8 +8,10 @@ type User struct {
 }
 
 type Event struct {
+	ID          int64  `json:"id"`
 	Name        string `json:"name"`
 	UserEmail   string `json:"user_email"`
+	Invite      string `json:"invite"`
 	Description string `json:"description"`
 	Start       int64  `json:"start"`
 	End         int64  `json:"end"`

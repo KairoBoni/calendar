@@ -19,7 +19,7 @@ import AddCircleIcon from '@material-ui/icons/AddCircle';
 import EditIcon from '@material-ui/icons/Edit';
 import { green } from '@material-ui/core/colors';
 import { Event } from "../../types";
-
+import { timeConverter } from "../../utils"
 
 
 interface AddEventProps {
@@ -50,18 +50,7 @@ function createData(
 }
 
 
-function timeConverter(UNIX_timestamp: number){
-  var a = new Date(UNIX_timestamp);
-  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  var year = a.getFullYear();
-  var month = months[a.getMonth()];
-  var date = a.getDate();
-  var hour = a.getHours();
-  var min = a.getMinutes();
-  var sec = a.getSeconds();
-  var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
-  return time;
-}
+
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -251,7 +240,7 @@ const useStyles = makeStyles((theme: Theme) =>
 const EventsTable = ({ handleOpenAddEvent, handleOpenEditEvent, events }: Props) => {
 
   const rows = events
-  .filter(item => item.id != 0)
+  .filter(item => item.id !== 0)
   .map((item) => {
     return createData(item.name, item.description, item.start, item.end, item.id)
   })

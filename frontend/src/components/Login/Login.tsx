@@ -1,7 +1,7 @@
 import React, { useState }  from "react";
 import { bindActionCreators, Dispatch } from "redux";
 import {connect} from "react-redux";
-import { UserReducer, Login } from '../../types'
+import { Login } from '../../types'
 import * as AppActions from "../../actions/AppActions";
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';

@@ -6,6 +6,7 @@ import TopBar from "../TopBar"
 import EventsTable from "../EventsTable"
 import AddEvent from "../AddEvent"
 import EditEvent from "../EditEvent"
+import InvitedEvent from "../InvitedEvent"
 import { makeStyles } from '@material-ui/core/styles';
 import { bindActionCreators, Dispatch } from "redux";
 import * as AppActions from "../../actions/AppActions";
@@ -24,6 +25,7 @@ interface StateProps {
 
 interface DispatchProps {
   getEvents(email: string):void
+  getEmailUsers(): void
 }
 
 type Props = StateProps & DispatchProps;
@@ -43,10 +45,11 @@ const useStyles = makeStyles((theme) => ({
   }));
   
 
-const Events = ({ getEvents, userReducer }: Props) => {
+const Events = ({ getEvents, getEmailUsers , userReducer }: Props) => {
 
   useEffect(() => {
     getEvents(userReducer.user.email)
+    getEmailUsers()
   }, []);
 
   const [openAddEvent, setOpenAddEvent] = React.useState(false);
@@ -59,12 +62,20 @@ const Events = ({ getEvents, userReducer }: Props) => {
     setOpenAddEvent(false);
   };
 
+  const initialEvent: Event = {
+    id:0,
+    name: "",
+    description: "",
+    start: 0,
+    end: 0
+  };
+
   const [openEditEvent, setOpenEditEvent] = React.useState(false);
-  const [selectedEvent, setSelectedEvent] = React.useState<Event>(userReducer.events[0]);
+  const [selectedEvent, setSelectedEvent] = React.useState<Event>(initialEvent);
 
 
   const handleOpenEditEvent = (id: number) => {
-    const event = userReducer.events.find(e => e.id == id)
+    const event = userReducer.events.find(e => e.id === id)
     setSelectedEvent(event!)
     setOpenEditEvent(true);
   };
@@ -72,6 +83,7 @@ const Events = ({ getEvents, userReducer }: Props) => {
   const handleCloseEditEvent = () => {
     setOpenEditEvent(false);
   };
+  console.log(userReducer.events)
 
     const classes = useStyles();
     return (
@@ -91,14 +103,29 @@ const Events = ({ getEvents, userReducer }: Props) => {
             userEvents={userReducer.events}
             handleClose={handleCloseAddEvent}
             isOpen={openAddEvent}
+            userEmailList={userReducer.user_emails}
           />
           <EditEvent
             event={selectedEvent}
             userEvents={userReducer.events}
             isOpen={openEditEvent}
             handleClose={handleCloseEditEvent}
-
+            userEmail={userReducer.user.email}
           />
+
+          {
+            userReducer.events
+            .filter(e => e.confirmed === false)
+            .map(e => {
+              return (
+                <InvitedEvent
+                  event={e}
+                  userEmail={userReducer.user.email}
+                  key={e.id}
+                />
+              )
+            })
+          }
           
         </React.Fragment>
         

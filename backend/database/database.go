@@ -45,7 +45,7 @@ func genSchema() string {
 		CREATE TABLE IF NOT EXISTS user_event (
 		id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 		user_email TEXT REFERENCES c_user(email),
-		event_id INTEGER REFERENCES event(id),
+		event_id INTEGER REFERENCES event(id) ON DELETE CASCADE,
 		confirmed BOOLEAN NOT NULL
 	);`
 

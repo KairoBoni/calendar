@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { bindActionCreators, Dispatch } from "redux";
 import { connect } from "react-redux";
 import * as AppActions from "../../actions/AppActions";
@@ -54,34 +54,29 @@ const Transition = React.forwardRef(function Transition(
 interface AddEventProps {
     handleClose(): void
     isOpen: boolean
-    event?: Event
+    event: Event
     userEvents: Event[]
+    userEmail: string
 }
 
 interface DispatchProps {
   DispatchNewMsg(severity: "success" | "error" | "info" | "warning", msg: string): void
+  getEvents(email: string):void
+  updateEvent(event: Event): void
+  deleteEvent(id: number): void
 }
 
 
 type Props = AddEventProps & DispatchProps;
 
-const EditEvent = ({ handleClose, isOpen, event, DispatchNewMsg, userEvents }: Props) => {
+const EditEvent = ({ handleClose, isOpen, event, DispatchNewMsg, userEvents, userEmail, getEvents, updateEvent, deleteEvent }: Props) => {
   const classes = useStyles();
 
-  const [start, setStart] = useState<Date | null>(new Date(event!.start))
-  const [end, setEnd] = useState<Date | null>(new Date(event!.end))
-  const [name, setName] = useState(event!.name)
-  const [description, setDescription] = useState(event!.description)
 
-
-  const clearForm = () => {
-    setStart(new Date())
-    setEnd(new Date())
-    setName('')
-    setDescription('')
-  }
-
-  
+  const [start, setStart] = useState<Date | null>(new Date())
+  const [end, setEnd] = useState<Date | null>(new Date())
+  const [name, setName] = useState("")
+  const [description, setDescription] = useState("")
 
   return (
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -94,7 +89,7 @@ const EditEvent = ({ handleClose, isOpen, event, DispatchNewMsg, userEvents }: P
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle id="alert-dialog-slide-title">Add A New Event</DialogTitle>
+        <DialogTitle id="alert-dialog-slide-title">Edit Event</DialogTitle>
         <DialogContent className={classes.DialogContent}>
         <div className={classes.Text}>
             <TextField
@@ -138,6 +133,18 @@ const EditEvent = ({ handleClose, isOpen, event, DispatchNewMsg, userEvents }: P
         <DialogActions>
           <Button onClick={() => {
           if (VerifyTimes(start!, end!, userEvents)) {
+            const e: Event = {
+              id: event.id,
+              name: name,
+              description: description,
+              user_email: userEmail,
+              start: start!.getTime(),
+              end: end!.getTime()
+          };
+
+            updateEvent(e)
+            setTimeout(function(){ getEvents(userEmail); }, 1000);
+            handleClose()
           } else {
             DispatchNewMsg("warning", "Cant Create New event, verify the time of start and end")
           }
@@ -145,10 +152,10 @@ const EditEvent = ({ handleClose, isOpen, event, DispatchNewMsg, userEvents }: P
             Schedule
           </Button>
           <Button onClick={() => {
-          if (VerifyTimes(start!, end!, userEvents)) {
-          } else {
-            DispatchNewMsg("warning", "Cant Create New event, verify the time of start and end")
-          }
+
+          deleteEvent(event!.id)
+          setTimeout(function(){ getEvents(userEmail); }, 1000);
+          handleClose()
           }} color="secondary">
             Delete
           </Button>

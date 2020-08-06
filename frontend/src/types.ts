@@ -20,6 +20,7 @@ export interface Event{
   start: number
   end: number
   confirmed?: boolean
+  invite?: string
 }
 
 /**
@@ -36,6 +37,8 @@ export interface AppReducer {
 export interface UserReducer {
   user: User
   events: Event[]
+  user_emails: string[]
+
 }
 
 export interface CombinedReducers {

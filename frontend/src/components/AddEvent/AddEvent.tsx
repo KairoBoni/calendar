@@ -60,6 +60,8 @@ interface AddEventProps {
     isOpen: boolean
     userEmail: string
     userEvents: Event[]
+    userEmailList: string[]
+
 
 }
 
@@ -72,7 +74,7 @@ interface DispatchProps {
 
 type Props = AddEventProps & DispatchProps;
 
-const AddEvent = ({ handleClose, isOpen, createEvent, userEmail, userEvents, DispatchNewMsg, getEvents }: Props) => {
+const AddEvent = ({ handleClose, isOpen, createEvent, userEmail, userEvents, DispatchNewMsg, getEvents, userEmailList }: Props) => {
   const classes = useStyles();
 
   const [start, setStart] = useState<Date | null>(new Date())
@@ -89,7 +91,7 @@ const AddEvent = ({ handleClose, isOpen, createEvent, userEmail, userEvents, Dis
     setDescription('')
   }
 
-  
+
 
   return (
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -128,9 +130,13 @@ const AddEvent = ({ handleClose, isOpen, createEvent, userEmail, userEvents, Dis
                 value={invite}
                 onChange={e => setInvite(e.target.value as string)}
               >
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>Thirty</MenuItem>
+                {
+                  userEmailList
+                  .filter(email => email !== userEmail)
+                  .map(email => {
+                  return <MenuItem value={email} key={email}>{email}</MenuItem>
+                  })
+                }
               </Select>
             </FormControl>
         </div>
@@ -166,11 +172,13 @@ const AddEvent = ({ handleClose, isOpen, createEvent, userEmail, userEvents, Dis
                 description: description,
                 user_email: userEmail,
                 start: start!.getTime(),
-                end: end!.getTime()
+                end: end!.getTime(),
+                confirmed: true,
+                invite: invite
             };
-  
+            
               createEvent(event)
-              getEvents(userEmail)
+              setTimeout(function(){ getEvents(userEmail); }, 1000);
               clearForm()
 
           } else {

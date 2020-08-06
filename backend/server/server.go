@@ -37,8 +37,13 @@ func (s *Server) setupRoutes() {
 
 	s.route.POST("/user/create", s.handlers.createUser)
 	s.route.POST("/user/login", s.handlers.login)
+	s.route.GET("/user/list", s.handlers.getUserEmails)
 	s.route.POST("/event/create", s.handlers.createEvent)
 	s.route.GET("/event/list/:email", s.handlers.getEvents)
+	s.route.PUT("/event/update", s.handlers.updateEvent)
+	s.route.DELETE("/event/delete/:id", s.handlers.deleteEvent)
+	s.route.PUT("/event/confirm", s.handlers.confirmInvite)
+	s.route.DELETE("/event/refuse", s.handlers.refuseInvite)
 
 }
 

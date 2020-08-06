@@ -56,6 +56,6 @@ const mapStateToProps = (state: any)  => ({
 });
 
 
-const mapDispatchToProps = (dispatch: Dispatch) => bindActionCreators(AppActions, dispatch);;
+const mapDispatchToProps = (dispatch: Dispatch) => bindActionCreators(AppActions, dispatch);
 
 export default connect(mapStateToProps, mapDispatchToProps)(SnackBar);

@@ -11,8 +11,6 @@ const initialState: AppReducer = {
 
 
 const appReducer: Reducer = (state = initialState, action) => {
-  console.log(action)
-
   switch (action.type) {
     case CalendarActionTypes.LOGIN_PAGE:
      return { ...state, page: "LOGIN_PAGE"};

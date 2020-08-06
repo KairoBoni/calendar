@@ -5,6 +5,7 @@ import { UserReducer } from "../types";
 
 
 const initialState: UserReducer = {
+    user_emails: [],
     user: {
         email: ""
     },
@@ -24,8 +25,11 @@ const userReducer: Reducer = (state = initialState, action) => {
     case CalendarActionTypes.LOGIN_SUCCESS:
         return { ...state, user: action.payload};
     case CalendarActionTypes.GET_EVENTS_SUCCESS:
-        console.log(action)
         return { ...state, events: action.payload};
+    case CalendarActionTypes.GET_USERS_EMAIL_SUCCESS:
+        return { ...state, user_emails: action.payload};
+    case CalendarActionTypes.LOGOUT:
+        return {state: initialState};
     default:
         return state;
   }

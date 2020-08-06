@@ -1,5 +1,5 @@
 # Build the Go API
-FROM golang:latest AS builder
+FROM golang:1.13 AS builder
 ADD . /app
 WORKDIR /app/backend
 RUN go mod download
@@ -17,5 +17,5 @@ COPY --from=builder /main ./
 COPY --from=node_builder /build ./web
 
 RUN chmod +x ./main
-EXPOSE 8080
+EXPOSE 5002
 CMD ./main

@@ -97,7 +97,6 @@ func (h *Handler) login(c echo.Context) error {
 
 func (h *Handler) getEvents(c echo.Context) error {
 	userEmail := c.Param("email")
-	fmt.Println(userEmail)
 	events, err := h.db.GetEvents(userEmail)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -105,7 +104,6 @@ func (h *Handler) getEvents(c echo.Context) error {
 	if len(events) == 0 {
 		return c.JSON(http.StatusOK, "[]")
 	}
-	fmt.Println(events)
 
 	r, err := json.Marshal(events)
 	if err != nil {

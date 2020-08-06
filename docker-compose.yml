@@ -35,7 +35,7 @@ services:
   rest-api:
     build:
       context: .
-      dockerfile: rest-api.dockerfile
+      dockerfile: Dockerfile
     container_name: rest-api
     ports:
       - "5002:5002"
